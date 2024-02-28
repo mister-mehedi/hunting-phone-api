@@ -1,12 +1,12 @@
-const loadPhone=async(searchText)=>{
+const loadPhone=async(searchText, isShowAll)=>{
   const res=await fetch(`https://openapi.programming-hero.com/api/phones?search=${searchText}`);
   const data=await res.json();
   const phones=data.data;
   // console.log(phones);
-  displayPhones(phones);
+  displayPhones(phones, isShowAll);
 }
 
-const displayPhones=phones=>{
+const displayPhones=(phones,isShowAll)=>{
   // console.log(phones);
 
   // 1
@@ -16,14 +16,17 @@ const displayPhones=phones=>{
   phoneContainer.textContent='';
 
   const showAllDiv=document.getElementById('show-all-container');
-  if(phones.length>12){
+  if(phones.length>12 && !isShowAll){
+    phones=phones.slice(0,12);
     showAllDiv.classList.remove('hidden');
   }else{
     showAllDiv.classList.add('hidden');
   }
 
   // display only first 12 phones
-  phones=phones.slice(0,12);
+  // if(!isShowAll){
+  //   phones=phones.slice(0,12);
+  // }
 
   phones.forEach(phone=>{
     // console.log(phone);
@@ -40,8 +43,8 @@ const displayPhones=phones=>{
           <div class="card-body">
             <h2 class="card-title">${phone.phone_name}</h2>
             <p>If a dog chews shoes whose shoes does he choose?</p>
-            <div class="card-actions justify-end">
-              <button class="btn btn-primary">Buy Now</button>
+            <div class="card-actions justify-center">
+              <button onClick="handleShowDetails('${phone.slug}')" class="btn btn-primary">Show Details</button>
             </div>
           </div>
     `;
@@ -55,8 +58,33 @@ const displayPhones=phones=>{
   toggleLoadingSpinner(false);
 }
 
+// Handle ShowDetails
+const handleShowDetails= async (id)=>{
+  // console.log('hello ',id);
+  // load single phone data
+  const res= await fetch(`https://openapi.programming-hero.com/api/phone/${id}`);
+  const data=await res.json();
+  const phone=data.data;
+
+  displayPhoneDetails(phone);
+}
+// Display
+const displayPhoneDetails=(phone)=>{
+  const phoneName=document.getElementById('show-detail-phone-name');
+  phoneName.innerText=phone.name;
+
+  const showDetailContainer=document.getElementById('show-detail-container');
+  showDetailContainer.innerHTML=`
+    <img src="${phone.image}" alt=""/>
+    <p> <span>Storage:</span>${phone?.mainFeatures?.storage}</p>
+    <p> <span>GPS:</span>${phone?.others?.GPS}</p>
+  `
+
+  show_details_modal.showModal()
+}
+
 // Handle Search Button
-const handleSrchBtn= ()=>{
+const handleSrchBtn= (isShowAll)=>{
   toggleLoadingSpinner(true);
 
   // console.log('seaarch button handled!')
@@ -64,7 +92,7 @@ const handleSrchBtn= ()=>{
   const searchText=searchField.value;
   // console.log(searchText);
 
-  loadPhone(searchText);
+  loadPhone(searchText,isShowAll);
 }
 
 const toggleLoadingSpinner=(isLoading)=>{
@@ -75,6 +103,10 @@ const toggleLoadingSpinner=(isLoading)=>{
     loadSpinner.classList.add('hidden');
   }
 
+}
+
+const handleShowAll=()=>{
+  handleSrchBtn(true);
 }
 
 // loadPhone();
