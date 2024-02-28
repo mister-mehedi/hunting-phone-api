@@ -77,7 +77,8 @@ const displayPhoneDetails=(phone)=>{
   showDetailContainer.innerHTML=`
     <img src="${phone.image}" alt=""/>
     <p> <span>Storage:</span>${phone?.mainFeatures?.storage}</p>
-    <p> <span>GPS:</span>${phone?.others?.GPS}</p>
+    <p> <span>GPS:</span>${phone?.others?.GPS || 'NO GPS'}</p>
+    <p> <span>GPS:</span>${phone?.others?.GPS ? phone.others.GPS: 'NO GPS'}</p>
   `
 
   show_details_modal.showModal()
